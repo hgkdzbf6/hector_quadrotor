@@ -13,6 +13,8 @@
         controller/velocity
         controller/position
         "/>
+    <arg name="use_ground_truth_for_tf" value="true" />
+    <arg name="use_ground_truth_for_control" value="false" />
   </include>
 
   <!-- Start rviz visualization with preset config -->

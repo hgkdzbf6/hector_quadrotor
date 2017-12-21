@@ -79,6 +79,7 @@ public:
 
       pose.header.stamp = ros::Time::now();
       pose_pub_.publish(pose);
+      ROS_INFO("command_pose:%lf,%lf,%lf",pose.pose.position.x,pose.pose.position.y,pose.pose.position.z);
 
       hector_uav_msgs::PoseFeedback feedback;
       feedback.current_pose = *pose_server_.getPose();

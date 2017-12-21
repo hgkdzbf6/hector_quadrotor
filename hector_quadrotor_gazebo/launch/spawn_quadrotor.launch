@@ -2,6 +2,9 @@
 
 <launch>
   <arg name="name" default="quadrotor"/>
+  <!-- 模型,其中quadrotor_base.urdf.xacro 中有模型的质量,碰撞,关节等信息.还自带超声波传感器 -->
+  <!--quadrotor_plugins.gazebo.xacro中有其他信息,比如quadrotor_sensors传感器,quadrotor_controller控制器-->
+  <!--quadrotor_propulsion推力,quadrotor_aerodynamics空气动力学什么的-->
   <arg name="model" default="$(find hector_quadrotor_description)/urdf/quadrotor.gazebo.xacro"/>
   <arg name="controllers" default="
     controller/position
