@@ -15,7 +15,7 @@ position:
         d: 0.0
 velocity:
     type: hector_quadrotor_controllers/VelocityController
-    max_xy: 10.0 # m/s
+    max_xy: 1.0 # m/s 10
     x: &vel_xy # velocity error in m/s -> acceleration in m/s^2
         p: 2.0
         i: 1.0
@@ -25,7 +25,7 @@ velocity:
         publish_state: true
     y: *vel_xy
     z: # velocity error in m/s -> acceleration in m/s^2
-        max: 5.0 # m/s
+        max: 5.0 # m/s 5
         p: 5.0
         i: 1.0
         d: 0.0

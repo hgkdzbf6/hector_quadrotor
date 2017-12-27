@@ -288,7 +288,7 @@ public:
       hector_uav_msgs::PoseGoal goal;
       goal.target_pose = pose_;
       pose_client_->sendGoal(goal);
-      ROS_INFO("action_pose:%lf,%lf,%lf,%lf",pose_.pose.position.x,pose_.pose.position.y,pose_.pose.position.z,yaw_);
+//      ROS_INFO("action_pose:%lf,%lf,%lf,%lf",pose_.pose.position.x,pose_.pose.position.y,pose_.pose.position.z,yaw_);
     }
     if (getButton(joy, buttons_.interrupt))
     {

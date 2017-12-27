@@ -212,6 +212,9 @@ public:
     wrench_control_.wrench.force.y  = 0.0;
     wrench_control_.wrench.force.z = thrust_command_.thrust;
 
+
+    //ROS_INFO("attitude_controller:%lf,%lf,%lf,%lf",wrench_control_.wrench.torque.x,
+    //		wrench_control_.wrench.torque.y, wrench_control_.wrench.torque.z,wrench_control_.wrench.force.z);
     // set wrench output
     wrench_control_.header.stamp = time;
     wrench_control_.header.frame_id = base_link_frame_;

@@ -266,6 +266,9 @@ public:
     yawrate_control.header.stamp = twist_command_.header.stamp;
     thrust_control.header.stamp = twist_command_.header.stamp;
 
+
+    //ROS_INFO("velocity_controller:%lf,%lf,%lf,%lf",attitude_control.roll,
+    //		attitude_control.pitch, yawrate_control.turnrate,thrust_control.thrust);
     // Update output from controller
     attitude_output_->setCommand(attitude_control);
     yawrate_output_->setCommand(yawrate_control);

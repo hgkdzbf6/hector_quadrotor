@@ -265,6 +265,8 @@ public:
       }
     }
 
+    //ROS_INFO("position_controller:%lf,%lf,%lf,%lf",output.linear.x,
+    //		output.linear.x, output.linear.x,output.angular.z );
     // set twist output
     twist_output_->setCommand(output);
   }
