@@ -276,7 +276,8 @@ private:
   {
     // TODO TF to world frame
     if (new_pose.header.frame_id != world_frame_) {
-      ROS_WARN_STREAM_THROTTLE_NAMED(1.0, "position_controller", "Pose commands must be given in the " << world_frame_ << " frame, ignoring command");
+      ROS_WARN_STREAM_THROTTLE_NAMED(1.0, "position_controller", "Pose commands must be given in the " << world_frame_ 
+        << " frame, but new pose is "<<new_pose.header.frame_id<<" , so ignoring command");
     }
     else
     {
