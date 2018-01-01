@@ -15,8 +15,8 @@
   <node name="teleop" pkg="hector_quadrotor_teleop" type="quadrotor_teleop" output="screen">
     <rosparam subst_value="true">
       control_mode: $(arg control_mode)
-      x_offset: 0.0
-      y_offset: 0.0
+      x_offset: 1.0
+      y_offset: 1.0
 
       x_axis: 5
       y_axis: 4

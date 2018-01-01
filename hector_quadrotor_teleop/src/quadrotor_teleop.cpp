@@ -60,6 +60,7 @@ private:
   boost::shared_ptr<PoseClient> pose_client_;
 
   geometry_msgs::PoseStamped pose_;
+
   double yaw_;
 
   struct Axis
@@ -101,11 +102,19 @@ private:
 
   double slow_factor_;
   std::string base_link_frame_, base_stabilized_frame_, world_frame_;
+  double x_offset_;
+  double y_offset_;
+
 
 public:
-  Teleop()
+  Teleop():
+	  x_offset_(0),y_offset_(0),yaw_(0)
+
   {
     ros::NodeHandle private_nh("~");
+
+    private_nh.param<double>("x_offset",x_offset_,0);
+    private_nh.param<double>("y_offset",y_offset_,0);
 
     private_nh.param<int>("x_axis", axes_.x.axis, 5);
     private_nh.param<int>("y_axis", axes_.y.axis, 4);
@@ -168,8 +177,8 @@ public:
       joy_subscriber_ = node_handle_.subscribe<sensor_msgs::Joy>("joy", 1,
                                                                  boost::bind(&Teleop::joyPoseCallback, this, _1));
 
-      pose_.pose.position.x = 0;
-      pose_.pose.position.y = 0;
+      pose_.pose.position.x = x_offset_;
+      pose_.pose.position.y = y_offset_;
       pose_.pose.position.z = 0;
       pose_.pose.orientation.x = 0;
       pose_.pose.orientation.y = 0;
@@ -279,6 +288,9 @@ public:
       pose_.pose.position.x += (cos(yaw_) * getAxis(joy, axes_.x) - sin(yaw_) * getAxis(joy, axes_.y)) * dt;
       pose_.pose.position.y += (cos(yaw_) * getAxis(joy, axes_.y) + sin(yaw_) * getAxis(joy, axes_.x)) * dt;
       pose_.pose.position.z += getAxis(joy, axes_.z) * dt;
+
+
+
       yaw_ += getAxis(joy, axes_.yaw) * M_PI/180.0 * dt;
 
       tf2::Quaternion q;
