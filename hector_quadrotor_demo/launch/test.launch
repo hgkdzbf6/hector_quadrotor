@@ -27,7 +27,7 @@
 
 
   <!-- Start aprilslam -->
-  <include file="$(find aprilslam)/launch/sim.launch" >
-  </include>
+   <!-- <include file="$(find aprilslam)/launch/sim2.launch" >
+  </include> --> 
 
 </launch>

@@ -3,6 +3,7 @@
 <launch>
    <arg name="model" default="$(find hector_quadrotor_description)/urdf/quadrotor_downward_cam.gazebo.xacro" />
 
+
    <group ns="uav1">
      <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
       <arg name="controllers" value="
@@ -23,7 +24,12 @@
   <node pkg="ecust_tool" type="ecust" name="ecust" />
   <node pkg="ecust_tool" type="gpsTool" name="ecust2" />
 
+  <!-- Start aprilslam -->
+  <include file="$(find aprilslam)/launch/sim2.launch" >
+  
    </group>
+
+
 
    <group ns="uav2">
      <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
@@ -67,7 +73,11 @@
 
   <node pkg="ecust_tool" type="ecust" name="ecust" />
   <node pkg="ecust_tool" type="gpsTool" name="ecust2" />
+  
+  
    </group>
 
+	<!--   <remap from="/uav1/chatter" to="/uav1/" /> --> 
+	
 </launch>
 

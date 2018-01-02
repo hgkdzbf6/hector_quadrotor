@@ -29,8 +29,6 @@
     <arg name="control_mode" value="position"/>
   </include>
 
-  <!-- Start aprilslam -->
-  <include file="$(find aprilslam)/launch/sim.launch" >
   </include>
 
 </launch>

@@ -1,59 +1,84 @@
 <?xml version="1.0"?>
 
 <launch>
-   <arg name="model" default="$(find hector_quadrotor_description)/urdf/quadrotor_downward_cam.gazebo.xacro" />
+	<arg name="model"
+		default="$(find hector_quadrotor_description)/urdf/quadrotor_downward_cam.gazebo.xacro" />
 
-   <group ns="uav1">
-     <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
-      <arg name="controllers" value="
+	<group ns="uav1">
+		<include
+			file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
+			<arg name="controllers"
+				value="
           controller/attitude
           controller/velocity
           controller/position
-          "/>
-      <arg name="use_ground_truth_for_tf" value="true" />
-      <arg name="use_ground_truth_for_control" value="true" />
+          " />
+			<arg name="use_ground_truth_for_tf" value="true" />
+			<arg name="use_ground_truth_for_control" value="true" />
 
-       <arg name="name" value="uav1" />
-       <arg name="tf_prefix" value="uav1" />
-       <arg name="model" value="$(arg model)" />       
-       <arg name="x" value="0.0" />
-       <arg name="y" value="0.0" />     
-     </include>
+			<arg name="name" value="uav1" />
+			<arg name="tf_prefix" value="uav1" />
+			<arg name="model" value="$(arg model)" />
+			<arg name="x" value="0.0" />
+			<arg name="y" value="0.0" />
+		</include>
 
-  <node pkg="ecust_tool" type="ecust" name="ecust" />
-  <node pkg="ecust_tool" type="gpsTool" name="ecust2" />
+		<node pkg="ecust_tool" type="ecust" name="ecust" />
+		<node pkg="ecust_tool" type="gpsTool" name="ecust2" />
+		<node pkg="ecust_tool" type="imageTool" name="ecust3" output="screen">
+			<param name="sub_str" value="/uav2/downward_cam/camera/apriltags" />
+			<param name="pub_str" value="/uav1/downward_cam/camera/other_apriltags" />
+		</node>
+		<include
+			file="$(find hector_quadrotor_teleop)/launch/xbox_controller.launch">
+			<arg name="control_mode" value="position" />
+		</include>
+		
+  		<include file="$(find aprilslam)/launch/sim2.launch" />
 
-  <include file="$(find hector_quadrotor_teleop)/launch/xbox_controller.launch" >
-    <arg name="control_mode" value="position"/>
-  </include>
+	</group>
 
-   </group>
+	<group ns="uav2">
+		<include
+			file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
 
-   <group ns="uav2">
-     <include file="$(find hector_quadrotor_gazebo)/launch/spawn_quadrotor.launch">
-
-      <arg name="controllers" value="
+			<arg name="controllers"
+				value="
           controller/attitude
           controller/velocity
           controller/position
-          "/>
-      <arg name="use_ground_truth_for_tf" value="true" />
-      <arg name="use_ground_truth_for_control" value="true" />
+          " />
+			<arg name="use_ground_truth_for_tf" value="true" />
+			<arg name="use_ground_truth_for_control" value="true" />
 
-       <arg name="name" value="uav2" />
-       <arg name="tf_prefix" value="uav2" />
-       <arg name="model" value="$(arg model)" />
-       <arg name="x" value="1.0" />
-       <arg name="y" value="1.0" />
-     </include>
+			<arg name="name" value="uav2" />
+			<arg name="tf_prefix" value="uav2" />
+			<arg name="model" value="$(arg model)" />
+			<arg name="x" value="1.0" />
+			<arg name="y" value="1.0" />
+		</include>
 
-  <node pkg="ecust_tool" type="ecust" name="ecust" />
-  <node pkg="ecust_tool" type="gpsTool" name="ecust2" />
+		<node pkg="ecust_tool" type="ecust" name="ecust" />
+		<node pkg="ecust_tool" type="gpsTool" name="ecust2" />
+		<node pkg="ecust_tool" type="imageTool" name="ecust3" output="screen">
+			<param name="sub_str" value="/uav1/downward_cam/camera/apriltags" />
+			<param name="pub_str" value="/uav2/downward_cam/camera/other_apriltags" />
+			<param name="sub_str" value="/uav1/downward_cam/camera/camera_info" />
+			<param name="pub_str" value="/uav2/downward_cam/camera/other_camera_info" />
+		</node>
 
-  <include file="$(find hector_quadrotor_teleop)/launch/xbox_controller2.launch" >
-    <arg name="control_mode" value="position"/>
-  </include>
-   </group>
+		<include file="$(find hector_quadrotor_teleop)/launch/xbox_controller2.launch">
+			<arg name="control_mode" value="position" />
+		</include>
+		
+		
+  		<include file="$(find aprilslam)/launch/sim2.launch" />
+	</group>
+
+	<remap from="/uav2/downward_cam/camera/apriltags" to="/uav1/downward_cam/camera/other_apriltags" />
+	<remap from="/uav2/downward_cam/camera/camera_info" to="/uav1/downward_cam/camera/other_camera_info" />
+	<remap from="/uav1/downward_cam/camera/apriltags" to="/uav2/downward_cam/camera/other_apriltags" />
+	<remap from="/uav1/downward_cam/camera/camera_info" to="/uav2/downward_cam/camera/other_camera_info" />
 
 </launch>
 
