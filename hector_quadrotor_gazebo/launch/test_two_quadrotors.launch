@@ -28,13 +28,18 @@
 		<node pkg="ecust_tool" type="imageTool" name="ecust3" output="screen">
 			<param name="sub_str" value="/uav2/downward_cam/camera/apriltags" />
 			<param name="pub_str" value="/uav1/downward_cam/camera/other_apriltags" />
+			<param name="sub_cam_info_str" value="/uav2/downward_cam/camera/camera_info" />
+			<param name="pub_cam_info_str" value="/uav1/downward_cam/camera/other_camera_info" />
 		</node>
 		<include
 			file="$(find hector_quadrotor_teleop)/launch/xbox_controller.launch">
 			<arg name="control_mode" value="position" />
 		</include>
 		
-  		<include file="$(find aprilslam)/launch/sim2.launch" />
+  		<include file="$(find aprilslam)/launch/sim2.launch" >
+		  	<arg name="new_frame_id" value="uav1_see_uav2_estimation" />
+		  	<arg name="parent_frame_id" value="uav1/downward_cam_optical_frame" />
+		</include>
 
 	</group>
 
@@ -60,19 +65,23 @@
 
 		<node pkg="ecust_tool" type="ecust" name="ecust" />
 		<node pkg="ecust_tool" type="gpsTool" name="ecust2" />
-		<node pkg="ecust_tool" type="imageTool" name="ecust3" output="screen">
+
+		 <node pkg="ecust_tool" type="imageTool" name="ecust3" output="screen">
 			<param name="sub_str" value="/uav1/downward_cam/camera/apriltags" />
 			<param name="pub_str" value="/uav2/downward_cam/camera/other_apriltags" />
-			<param name="sub_str" value="/uav1/downward_cam/camera/camera_info" />
-			<param name="pub_str" value="/uav2/downward_cam/camera/other_camera_info" />
-		</node>
+			<param name="sub_cam_info_str" value="/uav1/downward_cam/camera/camera_info" />
+			<param name="pub_cam_info_str" value="/uav2/downward_cam/camera/other_camera_info" />
+		</node> 
 
 		<include file="$(find hector_quadrotor_teleop)/launch/xbox_controller2.launch">
 			<arg name="control_mode" value="position" />
 		</include>
 		
 		
-  		<include file="$(find aprilslam)/launch/sim2.launch" />
+  		<include file="$(find aprilslam)/launch/sim2.launch" >
+		  	<arg name="new_frame_id" value="uav2_see_uav1_estimation" />
+		  	<arg name="parent_frame_id" value="uav2/downward_cam_optical_frame" />
+		</include>
 	</group>
 
 	<remap from="/uav2/downward_cam/camera/apriltags" to="/uav1/downward_cam/camera/other_apriltags" />
