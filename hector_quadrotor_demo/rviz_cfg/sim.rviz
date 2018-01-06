@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /RobotModel1/Links1
-        - /Image1
       Splitter Ratio: 0.601744175
     Tree Height: 334
   - Class: rviz/Selection
@@ -125,6 +124,7 @@ Visualization Manager:
         LaserScan: false
         MarkerArray: true
         Path: true
+        Pose: true
         Real position: true
         RobotModel: false
         Value: true
@@ -157,7 +157,7 @@ Visualization Manager:
       Marker Topic: /downward_cam/camera/apriltags_map
       Name: MarkerArray
       Namespaces:
-        36h11: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -165,7 +165,7 @@ Visualization Manager:
       Marker Topic: /downward_cam/camera/apriltags_marker
       Name: MarkerArray
       Namespaces:
-        36h11: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Image
@@ -194,6 +194,21 @@ Visualization Manager:
       Radius: 0.0500000007
       Reference Frame: base_link
       Value: true
+    - Alpha: 1
+      Axes Length: 1
+      Axes Radius: 0.100000001
+      Class: rviz/Pose
+      Color: 255; 25; 0
+      Enabled: true
+      Head Length: 0.300000012
+      Head Radius: 0.100000001
+      Name: Pose
+      Shaft Length: 1
+      Shaft Radius: 0.0500000007
+      Shape: Arrow
+      Topic: /fix/pose
+      Unreliable: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -218,7 +233,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 5.41207504
+      Distance: 10.1099596
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -233,10 +248,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.349796802
+      Pitch: 0.774796486
       Target Frame: base_stabilized
       Value: Orbit (rviz)
-      Yaw: 4.30174065
+      Yaw: 3.86673665
     Saved: ~
 Window Geometry:
   Camera:
@@ -258,5 +273,5 @@ Window Geometry:
   Views:
     collapsed: true
   Width: 1631
-  X: 65
+  X: 2078
   Y: 24

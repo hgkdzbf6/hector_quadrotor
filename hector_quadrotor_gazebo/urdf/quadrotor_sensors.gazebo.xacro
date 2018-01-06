@@ -25,7 +25,7 @@
             <topicName>pressure_height</topicName>
             <altimeterTopicName>altimeter</altimeterTopicName>
             <offset>0</offset>
-            <drift>1.0</drift>
+            <drift>0.01</drift>
             <gaussianNoise>0.01</gaussianNoise>
           </plugin>
 
@@ -40,7 +40,7 @@
           </plugin>
 
           <plugin name="quadrotor_gps_sim" filename="libhector_gazebo_ros_gps.so">
-            <updateRate>4</updateRate>
+            <updateRate>5</updateRate>
             <bodyName>base_link</bodyName>
             <frameId>$(arg base_link_frame)</frameId>
             <topicName>fix</topicName>

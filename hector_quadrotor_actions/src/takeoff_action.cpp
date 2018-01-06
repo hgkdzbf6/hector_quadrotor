@@ -47,7 +47,6 @@ public:
     nh.param<double>("takeoff_height", takeoff_height_, 0.3);
     nh.param<double>("connection_timeout", connection_timeout_, 10.0);
     nh.param<double>("action_timout", action_timeout_, 30.0);
-
     if(!pose_client_.waitForServer(ros::Duration(connection_timeout_))){
       ROS_ERROR_STREAM("Could not connect to " << nh.resolveName("action/pose"));
     }
