@@ -30,6 +30,7 @@
 #include <sensor_msgs/Joy.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <hector_uav_msgs/ControlMode.h>
 #include <hector_uav_msgs/YawrateCommand.h>
 #include <hector_uav_msgs/ThrustCommand.h>
 #include <hector_uav_msgs/AttitudeCommand.h>
@@ -54,6 +55,7 @@ private:
   ros::NodeHandle node_handle_;
   ros::Subscriber joy_subscriber_;
   ros::Publisher velocity_publisher_, attitude_publisher_, yawrate_publisher_, thrust_publisher_;
+  ros::Publisher control_mode_pub_;
   ros::ServiceClient motor_enable_service_;
   boost::shared_ptr<LandingClient> landing_client_;
   boost::shared_ptr<TakeoffClient> takeoff_client_;
@@ -137,6 +139,9 @@ public:
     private_nh.param<std::string>("control_mode", control_mode, "twist");
 
     ros::NodeHandle robot_nh;
+
+    control_mode_pub_=robot_nh.advertise<hector_uav_msgs::ControlMode>(
+            "control_mode", 1);
 
     // TODO factor out
     robot_nh.param<std::string>("base_link_frame", base_link_frame_, "base_link");
@@ -285,6 +290,13 @@ public:
 
     //起飞?调用起飞client?
     if(getButton(joy,buttons_.take_off)){
+
+  	  //当起飞成功之后,发一个control mode包
+  	  hector_uav_msgs::ControlMode msg;
+  	  msg.header.frame_id="control_mode";
+  	  msg.header.stamp=ros::Time(0);
+  	  msg.mode=hector_uav_msgs::ControlMode::TAKING_OFF;
+  	  control_mode_pub_.publish(msg);
     	hector_uav_msgs::TakeoffGoal takeoff_goal;
     	takeoff_client_->sendGoal(takeoff_goal);
     }

@@ -39,6 +39,7 @@
 
 #include <tf/transform_listener.h> // for tf::getPrefixParam()
 
+#include <hector_uav_msgs/ControlMode.h>
 #include <boost/thread/mutex.hpp>
 #include <std_msgs/Bool.h>
 #include <limits>
@@ -59,6 +60,7 @@ public:
   {
     attitude_subscriber_helper_.reset();
     estop_sub_.shutdown();
+    control_mode_sub_.shutdown();
   }
 
   virtual bool init(hector_quadrotor_interface::QuadrotorInterface *interface, ros::NodeHandle &root_nh,
@@ -105,6 +107,8 @@ public:
 
     estop_ = false;
     estop_sub_ = root_nh.subscribe("estop", 1, &AttitudeController::estopCb, this);
+
+    control_mode_sub_ = root_nh.subscribe("control_mode", 1, &AttitudeController::controlModeCb, this);
 
     return true;
   }
@@ -205,9 +209,16 @@ public:
     acceleration_command_body = pose_->toBody(acceleration_command_world);
 
     // 3. Control error is proportional to the desired acceleration in the body frame!
-    wrench_control_.wrench.torque.x = inertia_[0] * pid_.roll.computeCommand(-acceleration_command_body.y, period);
-    wrench_control_.wrench.torque.y = inertia_[1] * pid_.pitch.computeCommand(acceleration_command_body.x, period);
-    wrench_control_.wrench.torque.z = inertia_[2] * pid_.yawrate.computeCommand((yawrate_command_.turnrate - twist_body.angular.z), period);
+
+    if(mode_==hector_uav_msgs::ControlMode::TAKING_OFF){
+    	wrench_control_.wrench.torque.x=0;
+    	wrench_control_.wrench.torque.y=0;
+    	wrench_control_.wrench.torque.z=0;
+    }else{
+		wrench_control_.wrench.torque.x = inertia_[0] * pid_.roll.computeCommand(-acceleration_command_body.y, period);
+		wrench_control_.wrench.torque.y = inertia_[1] * pid_.pitch.computeCommand(acceleration_command_body.x, period);
+		wrench_control_.wrench.torque.z = inertia_[2] * pid_.yawrate.computeCommand((yawrate_command_.turnrate - twist_body.angular.z), period);
+    }
     wrench_control_.wrench.force.x  = 0.0;
     wrench_control_.wrench.force.y  = 0.0;
     wrench_control_.wrench.force.z = thrust_command_.thrust;
@@ -231,6 +242,17 @@ public:
       estop_thrust_command_ = thrust_command_;
     }
     estop_ = estop;
+  }
+
+  void controlModeCb(const hector_uav_msgs::ControlModeConstPtr &msg)
+  {
+	  hector_uav_msgs::ControlMode::_mode_type mode = static_cast<hector_uav_msgs::ControlMode::_mode_type>(msg->mode);
+//    if (mode_ == hector_uav_msgs::ControlMode::NORMAL_CONTROL
+//    		&& mode == hector_uav_msgs::ControlMode::TAKING_OFF)
+//    {
+    mode_ = mode;
+//    }
+//    estop_ = estop;
   }
 
 private:
@@ -259,6 +281,9 @@ private:
   std::string tf_prefix_;
 
   ros::Subscriber estop_sub_;
+  unsigned char mode_;
+  ros::Subscriber control_mode_sub_;
+
   bool estop_, command_estop_;
   hector_uav_msgs::ThrustCommand estop_thrust_command_;
   double estop_deceleration_;

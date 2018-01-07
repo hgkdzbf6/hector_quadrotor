@@ -30,8 +30,10 @@
 #include <actionlib/client/simple_action_client.h>
 #include <hector_uav_msgs/PoseAction.h>
 #include <hector_uav_msgs/TakeoffAction.h>
+#include <hector_uav_msgs/ControlMode.h>
 #include <hector_quadrotor_interface/helpers.h>
 #include <hector_quadrotor_actions/base_action.h>
+
 
 namespace hector_quadrotor_actions
 {
@@ -41,7 +43,8 @@ class TakeoffActionServer
 public:
   TakeoffActionServer(ros::NodeHandle nh)
       : takeoff_server_(nh, "action/takeoff", boost::bind(&TakeoffActionServer::takeoffActionCb, this, _1)),
-        pose_client_(nh, "action/pose")
+        pose_client_(nh, "action/pose"),
+		control_mode_pub_(nh.advertise<hector_uav_msgs::ControlMode>("control_mode", 10))
   {
     nh.param<double>("action_frequency", frequency_, 10.0);
     nh.param<double>("takeoff_height", takeoff_height_, 0.3);
@@ -69,8 +72,14 @@ public:
 
       if (pose_client_.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
       {
+    	  //当起飞成功之后,发一个control mode包
+    	  hector_uav_msgs::ControlMode msg;
+    	  msg.header.frame_id="control_mode";
+    	  msg.header.stamp=ros::Time(0);
+    	  msg.mode=hector_uav_msgs::ControlMode::NORMAL_CONTROL;
         ROS_WARN("Takeoff succeeded");
         takeoff_server_.get()->setSucceeded();
+        control_mode_pub_.publish(msg);
         return;
       }
     }
@@ -82,6 +91,7 @@ private:
   actionlib::SimpleActionClient<hector_uav_msgs::PoseAction> pose_client_;
   hector_quadrotor_actions::BaseActionServer<hector_uav_msgs::TakeoffAction> takeoff_server_;
   ros::Publisher pose_pub_;
+  ros::Publisher control_mode_pub_;
 
   double frequency_, takeoff_height_, connection_timeout_, action_timeout_;
 };
