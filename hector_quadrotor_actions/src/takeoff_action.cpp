@@ -50,8 +50,10 @@ public:
     if(!pose_client_.waitForServer(ros::Duration(connection_timeout_))){
       ROS_ERROR_STREAM("Could not connect to " << nh.resolveName("action/pose"));
     }
+    takeoff_server_.get()->start();
   }
 
+  //这个是和pose通信然后做的起飞控制,效果不好.
   void takeoffActionCb(const hector_uav_msgs::TakeoffGoalConstPtr &goal)
   {
 
@@ -60,6 +62,7 @@ public:
 
       hector_uav_msgs::PoseGoal pose_goal;
       pose_goal.target_pose = *takeoff_server_.getPose();
+      pose_goal.target_pose.header.frame_id="world";
       pose_goal.target_pose.pose.position.z = takeoff_height_;
       pose_client_.sendGoal(pose_goal);
       pose_client_.waitForResult(ros::Duration(action_timeout_));

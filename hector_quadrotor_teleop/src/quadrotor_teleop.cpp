@@ -98,6 +98,7 @@ private:
     Button go;
     Button stop;
     Button interrupt;
+    Button take_off;
   } buttons_;
 
   double slow_factor_;
@@ -128,6 +129,7 @@ public:
     private_nh.param<int>("go_button", buttons_.go.button, 1);
     private_nh.param<int>("stop_button", buttons_.stop.button, 2);
     private_nh.param<int>("interrupt_button", buttons_.interrupt.button, 3);
+    private_nh.param<int>("take_off_button", buttons_.take_off.button, 1);
     private_nh.param<double>("slow_factor", slow_factor_, 0.2);
 
     // TODO dynamic reconfig
@@ -281,6 +283,12 @@ public:
       dt = std::max(0.0, std::min(1.0, (now - pose_.header.stamp).toSec()));
     }
 
+    //起飞?调用起飞client?
+    if(getButton(joy,buttons_.take_off)){
+    	hector_uav_msgs::TakeoffGoal takeoff_goal;
+    	takeoff_client_->sendGoal(takeoff_goal);
+    }
+
     if (getButton(joy, buttons_.go))
     {
       pose_.header.stamp = now;
@@ -288,8 +296,6 @@ public:
       pose_.pose.position.x += (cos(yaw_) * getAxis(joy, axes_.x) - sin(yaw_) * getAxis(joy, axes_.y)) * dt;
       pose_.pose.position.y += (cos(yaw_) * getAxis(joy, axes_.y) + sin(yaw_) * getAxis(joy, axes_.x)) * dt;
       pose_.pose.position.z += getAxis(joy, axes_.z) * dt;
-
-
 
       yaw_ += getAxis(joy, axes_.yaw) * M_PI/180.0 * dt;
 
@@ -338,8 +344,9 @@ public:
       ROS_ERROR_STREAM("Button " << button.button << " out of range, joy has " << joy->buttons.size() << " buttons");
       return false;
     }
-
-    return joy->buttons[button.button - 1] > 0;
+    bool a=joy->buttons[button.button - 1] > 0;
+    if(a==true)ROS_INFO("button %d pressed", button.button);
+    return a;
   }
 
   bool enableMotors(bool enable)

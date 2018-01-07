@@ -9,6 +9,7 @@ add_message_files(
   AttitudeCommand.msg
   Compass.msg
   ControllerState.msg
+  ControlMode.msg
   HeadingCommand.msg
   HeightCommand.msg
   MotorCommand.msg

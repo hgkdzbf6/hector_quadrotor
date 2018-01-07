@@ -27,6 +27,7 @@
       slow_button: 4
       go_button: 6
       stop_button: 2
+      take_off_button: 1
     </rosparam>
 
   </node>
