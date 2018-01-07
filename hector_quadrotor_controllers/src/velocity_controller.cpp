@@ -32,6 +32,7 @@
 #include <controller_interface/controller.h>
 #include <control_toolbox/pid.h>
 
+#include <hector_uav_msgs/ControlMode.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/WrenchStamped.h>
 
@@ -104,6 +105,7 @@ public:
     cmd_vel_subscriber_ = root_nh.subscribe<geometry_msgs::Twist>("cmd_vel", 1, boost::bind(
         &VelocityController::cmd_velCommandCallback, this, _1));
 
+    control_mode_sub_ = root_nh.subscribe("control_mode", 1, &VelocityController::controlModeCb, this);
     return true;
   }
 
@@ -127,6 +129,11 @@ public:
     attitude_output_->stop();
     yawrate_output_->stop();
     thrust_output_->stop();
+  }
+
+  void controlModeCb(const hector_uav_msgs::ControlModeConstPtr &msg){
+	  hector_uav_msgs::ControlMode::_mode_type mode = static_cast<hector_uav_msgs::ControlMode::_mode_type>(msg->mode);
+	  mode_=mode;
   }
 
   void twistCommandCallback(const geometry_msgs::TwistStampedConstPtr &command)
@@ -256,15 +263,24 @@ public:
     hector_uav_msgs::AttitudeCommand attitude_control;
     hector_uav_msgs::YawrateCommand yawrate_control;
     hector_uav_msgs::ThrustCommand thrust_control;
-    attitude_control.roll    = -asin(std::min(std::max(acceleration_command_base_stabilized.y / gravity, -1.0), 1.0));
-    attitude_control.pitch   =  asin(std::min(std::max(acceleration_command_base_stabilized.x / gravity, -1.0), 1.0));
-    yawrate_control.turnrate = command.angular.z;
-    thrust_control.thrust    = mass_ * ((acceleration_command.z - gravity) * load_factor + gravity);
+
+    if(mode_==hector_uav_msgs::ControlMode::TAKING_OFF){
+        attitude_control.roll    =  0;
+        attitude_control.pitch   =  0;
+    	yawrate_control.turnrate =  0;
+        thrust_control.thrust    = 10000;
+    }else{
+        attitude_control.roll    = -asin(std::min(std::max(acceleration_command_base_stabilized.y / gravity, -1.0), 1.0));
+        attitude_control.pitch   =  asin(std::min(std::max(acceleration_command_base_stabilized.x / gravity, -1.0), 1.0));
+    	yawrate_control.turnrate = command.angular.z;
+        thrust_control.thrust    = mass_ * ((acceleration_command.z - gravity) * load_factor + gravity);
+    }
 
     // pass down time stamp from twist command
     attitude_control.header.stamp = twist_command_.header.stamp;
     yawrate_control.header.stamp = twist_command_.header.stamp;
     thrust_control.header.stamp = twist_command_.header.stamp;
+
 
 
     //ROS_INFO("velocity_controller:%lf,%lf,%lf,%lf",attitude_control.roll,
@@ -285,8 +301,11 @@ private:
   YawrateCommandHandlePtr yawrate_output_;
   ThrustCommandHandlePtr thrust_output_;
 
+  ros::Subscriber control_mode_sub_;
   ros::Subscriber twist_subscriber_;
   ros::Subscriber cmd_vel_subscriber_;
+
+  hector_uav_msgs::ControlMode::_mode_type mode_;
 
   geometry_msgs::TwistStamped twist_command_;
 

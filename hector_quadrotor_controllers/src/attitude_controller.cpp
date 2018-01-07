@@ -210,15 +210,10 @@ public:
 
     // 3. Control error is proportional to the desired acceleration in the body frame!
 
-    if(mode_==hector_uav_msgs::ControlMode::TAKING_OFF){
-    	wrench_control_.wrench.torque.x=0;
-    	wrench_control_.wrench.torque.y=0;
-    	wrench_control_.wrench.torque.z=0;
-    }else{
 		wrench_control_.wrench.torque.x = inertia_[0] * pid_.roll.computeCommand(-acceleration_command_body.y, period);
 		wrench_control_.wrench.torque.y = inertia_[1] * pid_.pitch.computeCommand(acceleration_command_body.x, period);
 		wrench_control_.wrench.torque.z = inertia_[2] * pid_.yawrate.computeCommand((yawrate_command_.turnrate - twist_body.angular.z), period);
-    }
+
     wrench_control_.wrench.force.x  = 0.0;
     wrench_control_.wrench.force.y  = 0.0;
     wrench_control_.wrench.force.z = thrust_command_.thrust;

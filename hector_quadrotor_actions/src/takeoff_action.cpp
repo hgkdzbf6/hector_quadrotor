@@ -41,18 +41,19 @@ namespace hector_quadrotor_actions
 class TakeoffActionServer
 {
 public:
+
+//这一段要从原理上面大改
+//不订阅pose_action了,直接看估计出来的结果,也就是看pose消息的position.z.
   TakeoffActionServer(ros::NodeHandle nh)
       : takeoff_server_(nh, "action/takeoff", boost::bind(&TakeoffActionServer::takeoffActionCb, this, _1)),
-        pose_client_(nh, "action/pose"),
+		pose_sub_(nh.subscribe("pose",1,&TakeoffActionServer::poseCallback,this)),
 		control_mode_pub_(nh.advertise<hector_uav_msgs::ControlMode>("control_mode", 10))
   {
     nh.param<double>("action_frequency", frequency_, 10.0);
     nh.param<double>("takeoff_height", takeoff_height_, 0.3);
     nh.param<double>("connection_timeout", connection_timeout_, 10.0);
     nh.param<double>("action_timout", action_timeout_, 30.0);
-    if(!pose_client_.waitForServer(ros::Duration(connection_timeout_))){
-      ROS_ERROR_STREAM("Could not connect to " << nh.resolveName("action/pose"));
-    }
+
     takeoff_server_.get()->start();
   }
 
@@ -62,35 +63,34 @@ public:
 
     if(takeoff_server_.enableMotors(true))
     {
-
-      hector_uav_msgs::PoseGoal pose_goal;
-      pose_goal.target_pose = *takeoff_server_.getPose();
-      pose_goal.target_pose.header.frame_id="world";
-      pose_goal.target_pose.pose.position.z = takeoff_height_;
-      pose_client_.sendGoal(pose_goal);
-      pose_client_.waitForResult(ros::Duration(action_timeout_));
-
-      if (pose_client_.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
+		//当起飞成功之后,发一个control mode包
+		hector_uav_msgs::ControlMode msg;
+		msg.header.frame_id="control_mode";
+		msg.header.stamp=ros::Time(0);
+		msg.mode=hector_uav_msgs::ControlMode::TAKING_OFF;
+      if (pose_.pose.position.z > takeoff_height_ )
       {
-    	  //当起飞成功之后,发一个control mode包
-    	  hector_uav_msgs::ControlMode msg;
-    	  msg.header.frame_id="control_mode";
-    	  msg.header.stamp=ros::Time(0);
-    	  msg.mode=hector_uav_msgs::ControlMode::NORMAL_CONTROL;
-        ROS_WARN("Takeoff succeeded");
-        takeoff_server_.get()->setSucceeded();
-        control_mode_pub_.publish(msg);
-        return;
+		//当起飞成功之后,发一个control mode包
+		msg.mode=hector_uav_msgs::ControlMode::NORMAL_CONTROL;
+		ROS_WARN("Takeoff succeeded");
+		control_mode_pub_.publish(msg);
+		takeoff_server_.get()->setSucceeded();
+		return;
       }
+		control_mode_pub_.publish(msg);
     }
     ROS_WARN("Takeoff failed");
     takeoff_server_.get()->setAborted();
   }
 
+  void poseCallback(const geometry_msgs::PoseStampedConstPtr & msg){
+	  pose_=geometry_msgs::PoseStamped(*msg);
+  }
+
 private:
-  actionlib::SimpleActionClient<hector_uav_msgs::PoseAction> pose_client_;
   hector_quadrotor_actions::BaseActionServer<hector_uav_msgs::TakeoffAction> takeoff_server_;
-  ros::Publisher pose_pub_;
+  geometry_msgs::PoseStamped pose_;
+  ros::Subscriber pose_sub_;
   ros::Publisher control_mode_pub_;
 
   double frequency_, takeoff_height_, connection_timeout_, action_timeout_;
