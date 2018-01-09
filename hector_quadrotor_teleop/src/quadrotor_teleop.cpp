@@ -290,15 +290,17 @@ public:
 
     //起飞?调用起飞client?
     if(getButton(joy,buttons_.take_off)){
-
-  	  //当起飞成功之后,发一个control mode包
-  	  hector_uav_msgs::ControlMode msg;
-  	  msg.header.frame_id="control_mode";
-  	  msg.header.stamp=ros::Time(0);
-  	  msg.mode=hector_uav_msgs::ControlMode::TAKING_OFF;
-  	  control_mode_pub_.publish(msg);
-    	hector_uav_msgs::TakeoffGoal takeoff_goal;
-    	takeoff_client_->sendGoal(takeoff_goal);
+		//当起飞成功之后,发一个control mode包
+		hector_uav_msgs::ControlMode msg;
+		msg.header.frame_id="control_mode";
+		msg.header.stamp=now;
+		msg.mode=hector_uav_msgs::ControlMode::TAKING_OFF;
+		control_mode_pub_.publish(msg);
+		hector_uav_msgs::TakeoffGoal takeoff_goal;
+		ROS_WARN("take off button pressed!");
+		takeoff_client_->sendGoal(takeoff_goal);
+		//pose_.pose.position.z = takeoff_height_;
+		pose_.pose.position.z = 2.1;
     }
 
     if (getButton(joy, buttons_.go))
@@ -357,7 +359,7 @@ public:
       return false;
     }
     bool a=joy->buttons[button.button - 1] > 0;
-    if(a==true)ROS_INFO("button %d pressed", button.button);
+    //if(a==true)ROS_INFO("button %d pressed", button.button);
     return a;
   }
 

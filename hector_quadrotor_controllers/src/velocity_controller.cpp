@@ -265,9 +265,9 @@ public:
     hector_uav_msgs::ThrustCommand thrust_control;
 
     if(mode_==hector_uav_msgs::ControlMode::TAKING_OFF){
-        attitude_control.roll    =  0;
-        attitude_control.pitch   =  0;
-    	yawrate_control.turnrate =  0;
+        attitude_control.roll    =  0.001;
+        attitude_control.pitch   =  0.001;
+    	yawrate_control.turnrate =  0.001;
         thrust_control.thrust    = 10000;
     }else{
         attitude_control.roll    = -asin(std::min(std::max(acceleration_command_base_stabilized.y / gravity, -1.0), 1.0));

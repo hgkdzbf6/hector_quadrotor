@@ -76,7 +76,7 @@ public:
     root_nh.param<double>("estop_deceleration", estop_deceleration_, 1.0);
     double command_timeout_sec = 0.0;
     root_nh.param<double>("command_timeout", command_timeout_sec, 0.0);
-    command_timeout_ = ros::Duration(command_timeout_sec);
+    command_timeout_ = ros::Duration(0.001);
 
     // resolve frames
     tf_prefix_ = tf::getPrefixParam(root_nh);
@@ -182,7 +182,8 @@ public:
     accel_body.linear = pose_->toBody(accel.linear);
     accel_body.angular = pose_->toBody(accel.angular);
 
-    if (estop_ || command_estop_)
+    if (estop_)
+//  if (estop_ || command_estop_)
     {
       attitude_command_.roll = attitude_command_.pitch = yawrate_command_.turnrate = 0;
       estop_thrust_command_.thrust -= estop_deceleration_ * mass_ * period.toSec();
@@ -210,9 +211,9 @@ public:
 
     // 3. Control error is proportional to the desired acceleration in the body frame!
 
-		wrench_control_.wrench.torque.x = inertia_[0] * pid_.roll.computeCommand(-acceleration_command_body.y, period);
-		wrench_control_.wrench.torque.y = inertia_[1] * pid_.pitch.computeCommand(acceleration_command_body.x, period);
-		wrench_control_.wrench.torque.z = inertia_[2] * pid_.yawrate.computeCommand((yawrate_command_.turnrate - twist_body.angular.z), period);
+	wrench_control_.wrench.torque.x = inertia_[0] * pid_.roll.computeCommand(-acceleration_command_body.y, period);
+	wrench_control_.wrench.torque.y = inertia_[1] * pid_.pitch.computeCommand(acceleration_command_body.x, period);
+	wrench_control_.wrench.torque.z = inertia_[2] * pid_.yawrate.computeCommand((yawrate_command_.turnrate - twist_body.angular.z), period);
 
     wrench_control_.wrench.force.x  = 0.0;
     wrench_control_.wrench.force.y  = 0.0;
